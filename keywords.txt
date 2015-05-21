@@ -1,0 +1,100 @@
+###########################################
+# Syntax Coloring Map For TEA5767_FMRadio
+#             Version 0.1
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+FMRadio	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+
+init	KEYWORD2
+send_data	KEYWORD2
+receive_data	KEYWORD2
+get_i2c_address	KEYWORD2
+get_frequency	KEYWORD2
+get_frequency_MHz	KEYWORD2
+get_config_bit	KEYWORD2
+get_mute	KEYWORD2
+get_search_mode	KEYWORD2
+get_search_dir	KEYWORD2
+get_search_stop_level	KEYWORD2
+get_side_injection	KEYWORD2
+get_stereo	KEYWORD2
+get_right_channel_mute	KEYWORD2
+get_left_channel_mute	KEYWORD2
+get_SW_programmable_port_1	KEYWORD2
+get_SW_programmable_port_2	KEYWORD2
+get_standby_setting	KEYWORD2
+get_bandlimit_setting	KEYWORD2
+get_clock_frequency	KEYWORD2
+get_SW_mute	KEYWORD2
+get_stereo_noice_cancel	KEYWORD2
+get_search_indicator	KEYWORD2
+deemphasis_time_const	KEYWORD2
+set_frequency_MHz	KEYWORD2
+mute	KEYWORD2
+unmute	KEYWORD2
+set_search_mode	KEYWORD2
+set_search_dir	KEYWORD2
+set_search_stop_level	KEYWORD2
+set_side_injection	KEYWORD2
+set_mono	KEYWORD2
+set_stereo	KEYWORD2
+set_right_channel_mute	KEYWORD2
+set_right_channel_unmute	KEYWORD2
+set_left_channel_mute	KEYWORD2
+set_left_channel_unmute	KEYWORD2
+set_SW_programmable_port_1	KEYWORD2
+set_SW_programmable_port_2	KEYWORD2
+standby	KEYWORD2
+wakeup	KEYWORD2
+set_japanese_band_limit	KEYWORD2
+set_EU_band_limit	KEYWORD2
+set_clock_frequency	KEYWORD2
+set_SW_mute	KEYWORD2
+set_stereo_noice_cancel	KEYWORD2
+set_search_indicator	KEYWORD2
+set_deemphasis_time_const	KEYWORD2
+
+###########################################
+# Constants LITERAL1
+###########################################
+
+TAE5767_ADDRESS	LITERAL1
+NR_OF_DATABLOCKS	LITERAL1
+UP	1LITERAL1
+DOWN	LITERAL1
+HIGH	LITERAL1
+LOW	0LITERAL1
+CLOCK_FREQ_13MHZ	LITERAL1
+CLOCK_FREQ_327868HZ	LITERAL1
+CLOCK_FREQ_6_5MHZ	LITERAL1
+DTC_50US	LITERAL1
+DTC_75US	LITERAL1
+MUTE	LITERAL1
+SM	LITERAL1
+SUD	LITERAL1
+SSL_LOW	LITERAL1
+SSL_MID	LITERAL1
+SSL_HIGH	LITERAL1
+HLSI_HIGH	LITERAL1
+MS	LITERAL1
+MR	LITERAL1
+ML	LITERAL1
+SWP1	LITERAL1
+SWP2	LITERAL1
+STBY	LITERAL1
+BL	LITERAL1
+XTAL	LITERAL1
+SMUTE	LITERAL1
+HCC	LITERAL1
+SNC	LITERAL1
+SI	LITERAL1
+PLLREF	LITERAL1
+DTC	LITERAL1
