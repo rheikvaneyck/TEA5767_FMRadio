@@ -22,7 +22,7 @@
 /*  see <http://www.gnu.org/licenses/>.                         */
 /*                                                              */
 /*##############################################################*/
-#include "TAE5767_FMRadio.h"
+#include "TEA5767_FMRadio.h"
 
 FMRadio::FMRadio(uint8_t i2c_address) 
 {
@@ -58,14 +58,14 @@ void FMRadio::receive_data(void)
 	}
 };
 
-// Get Config //////////////////////////////////////////////////////////
+/* Get Config **************************************************/
 uint8_t FMRadio::get_i2c_address(void) {
 	return _i2c_address;
 }
 
 uint8_t FMRadio::get_config_bit(uint8_t data_byte, uint8_t config_bit)
 {
-	return (_fmTAE5767_info[data_byte]&config_bit);
+	return (_fmTAE5767_config[data_byte]&config_bit);
 }
 
 void FMRadio::set_config_bit(bool on, uint8_t data_byte, uint8_t config_bit)
@@ -77,7 +77,42 @@ void FMRadio::set_config_bit(bool on, uint8_t data_byte, uint8_t config_bit)
 	}
 };
 
-// DEBUG ////////////////////////////
+/* Get Info ***************************************************/
+uint8_t FMRadio::get_info_bit(uint8_t data_byte, uint8_t config_bit)
+{
+	return (_fmTAE5767_info[data_byte]&config_bit);
+};
+
+uint8_t FMRadio::get_ready_flag(void){return FMRadio::get_info_bit(0, RF);};
+uint8_t FMRadio::get_band_limit_flag(void){return FMRadio::get_info_bit(0, BLF);};
+uint32_t FMRadio::get_frequency(void) {
+	int8_t hlsi_factor = 1;
+	uint32_t frequency;
+	// calculating PLL word
+	// done mathematics
+	// N = 4*(f_RF + f_IF)/f_ref on page 30 of datasheet
+	if (!(_fmTAE5767_config[2] & HLSI_HIGH)) {
+		hlsi_factor = -1;
+	}
+	frequency = ((_fmTAE5767_info[0]&0x3F)<<8) + _fmTAE5767_info[1];
+	if(_fmTAE5767_config[4] & PLLREF) {
+		// PLLREF is set
+		frequency = ((frequency * 50000)>>2) - hlsi_factor*225000;
+	} else { 
+		// PLLREF is not set, XTAL should be
+		frequency = (frequency << 13) - hlsi_factor*225000; 
+	}
+	return frequency;	
+};
+float FMRadio::get_frequency_MHz(void){return ((float) FMRadio::get_frequency())/1000000.0;};
+uint8_t FMRadio::get_stereo_reception(void){return FMRadio::get_info_bit(2, STEREO);};
+uint8_t FMRadio::get_if_counter(void){return (_fmTAE5767_info[2]&0x7F);};
+uint8_t FMRadio::get_level_ADC(void) {return (_fmTAE5767_info[3]>>4);};
+uint8_t FMRadio::get_chip_ID(void){return ((_fmTAE5767_info[3]&0xE)>>1);};
+
+/* DEBUG ******************/
+
+
 uint8_t FMRadio::get_1st_byte(void) {
 	return 	_fmTAE5767_config[0];
 }
@@ -93,9 +128,11 @@ uint8_t FMRadio::get_4th_byte(void) {
 uint8_t FMRadio::get_5th_byte(void) {
 	return 	_fmTAE5767_config[4];
 };
-/////////////////////////////////////
 
-uint32_t FMRadio::get_frequency(void) {
+/* END ********************/
+
+/* Verbose Functions ******/
+uint32_t FMRadio::get_config_frequency(void) {
 	int8_t hlsi_factor = 1;
 	uint32_t frequency;
 	// calculating PLL word
@@ -113,11 +150,11 @@ uint32_t FMRadio::get_frequency(void) {
 		frequency = (frequency << 13) - hlsi_factor*225000; 
 	}
 	return frequency;	
-}
+};
 
-float FMRadio::get_frequency_MHz(void) 
+float FMRadio::get_config_frequency_MHz(void) 
 {
-	return ((float) FMRadio::get_frequency())/1000000.0;
+	return ((float) FMRadio::get_config_frequency())/1000000.0;
 };
 
 uint8_t FMRadio::get_mute(void){return FMRadio::get_config_bit(0,MUTE);};
@@ -146,6 +183,7 @@ uint8_t FMRadio::get_SW_mute(void){return FMRadio::get_config_bit(3,SMUTE);};
 uint8_t FMRadio::get_stereo_noice_cancel(void){return FMRadio::get_config_bit(3,SNC);};
 uint8_t FMRadio::get_search_indicator(void){return FMRadio::get_config_bit(3,SI);};
 uint8_t FMRadio::deemphasis_time_const(void){return FMRadio::get_config_bit(4,DTC);};
+/* End Verbose Functions ******/
 
 // Set Config ///////////////////////////////////////////////////////
 
@@ -200,6 +238,23 @@ void FMRadio::set_search_stop_level(uint8_t ssl)
 	}
 	_fmTAE5767_config[2] |= ssl;
 };
+
+void FMRadio::set_SW_mute(void)
+{
+	FMRadio::set_config_bit(true, 3, SMUTE);
+};
+
+void FMRadio::set_SW_unmute(void)
+{
+	FMRadio::set_config_bit(false, 3, SMUTE);
+};
+
+void FMRadio::set_stereo_noice_cancel(bool on)
+{
+	FMRadio::set_config_bit(on, 3, SNC);
+};
+
+
 
 void FMRadio::set_side_injection(bool hlsi)
 {
@@ -282,21 +337,6 @@ void FMRadio::set_clock_frequency(uint8_t clock_freq)
 			_fmTAE5767_config[4] |= PLLREF;
 			break;
 		}
-};
-
-void FMRadio::set_SW_mute(void)
-{
-	FMRadio::set_config_bit(true, 3, SMUTE);
-};
-
-void FMRadio::set_SW_unmute(void)
-{
-	FMRadio::set_config_bit(false, 3, SMUTE);
-};
-
-void FMRadio::set_stereo_noice_cancel(bool on)
-{
-	FMRadio::set_config_bit(on, 3, SNC);
 };
 
 void FMRadio::set_search_indicator(bool on)
