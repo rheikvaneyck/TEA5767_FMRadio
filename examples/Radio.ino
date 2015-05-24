@@ -69,7 +69,7 @@ void loop() {
         Serial.print("freq(MHz): "); Serial.println(freq, DEC);
         break; 
       case 'p': freq = Radio.seek(DOWN, SSL_LOW);
-        if(freq == UPPER_BAND_LIMIT) {
+        if(freq == LOWER_BAND_LIMIT) {
           Serial.println("Band limit reached");
         } else {
           Serial.println("Station found"); 
