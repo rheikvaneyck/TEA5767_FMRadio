@@ -38,6 +38,8 @@ FMRadio::FMRadio(uint8_t i2c_address)
 
 void FMRadio::init(void) {
 	FMRadio::send_data();
+	delay(100);
+	FMRadio::receive_data();
 }
 
 void FMRadio::send_data(void) 
@@ -254,8 +256,6 @@ void FMRadio::set_stereo_noice_cancel(bool on)
 	FMRadio::set_config_bit(on, 3, SNC);
 };
 
-
-
 void FMRadio::set_side_injection(bool hlsi)
 {
 	FMRadio::set_config_bit(hlsi, 2, MUTE);
@@ -339,6 +339,8 @@ void FMRadio::set_clock_frequency(uint8_t clock_freq)
 		}
 };
 
+void FMRadio::set_high_cut_control(bool on){FMRadio::set_config_bit(on, 3, HCC);};
+
 void FMRadio::set_search_indicator(bool on)
 {
 	// FIXME: Test for an other bit necassary
@@ -356,3 +358,71 @@ void FMRadio::set_deemphasis_time_const(uint8_t time_constant)
 			break;
 	}
 };
+
+uint8_t FMRadio::auto_injection_dir(float frequency_MHz)
+{
+	// Thanks to andy karpow
+	uint8_t adc_high = 0;
+	uint8_t adc_low = 0;
+	uint8_t is = HIGH;
+
+	FMRadio::mute();
+	FMRadio::set_frequency_MHz(frequency_MHz + 0.45);
+	FMRadio::send_data();
+	delay(30);
+	FMRadio::receive_data();
+	delay(30);
+	adc_high = FMRadio::get_level_ADC();
+
+	FMRadio::set_frequency_MHz(frequency_MHz - 0.45);
+	FMRadio::send_data();
+	delay(30);
+	FMRadio::receive_data();
+	delay(30);
+	adc_low = FMRadio::get_level_ADC();
+
+	if(adc_high < adc_low) {
+		is = HIGH;
+	} else {
+		is = LOW;
+	}
+	FMRadio::set_side_injection(is);
+	FMRadio::set_frequency_MHz(frequency_MHz);
+	FMRadio::unmute();
+	delay(30);
+	return is;
+}
+;
+
+float FMRadio::seek(bool dir, uint8_t ssl)
+{
+	int8_t factor = -1 + (dir*2);
+
+	FMRadio::receive_data();
+	delay(30);
+	FMRadio::set_frequency_MHz(FMRadio::get_frequency_MHz()+(factor*0.1)); // +0.1 if dir=1, -0.1 if dir=0;
+  FMRadio::set_search_mode(ON);
+  FMRadio::set_search_dir(dir);
+  FMRadio::set_search_stop_level(ssl);
+  FMRadio::set_search_indicator(OFF);
+  FMRadio::send_data();
+  delay(100);
+  FMRadio::receive_data();
+  delay(30);
+
+  if(FMRadio::get_band_limit_flag()) {
+  	if(dir == UP) {
+  		return UPPER_BAND_LIMIT;
+  	} else {
+  		return LOWER_BAND_LIMIT;
+  	}
+  } else {
+    if(FMRadio::get_ready_flag()) {
+      return FMRadio::get_frequency_MHz();
+    } else {
+    	// FIXME shouldn't stop here, if RF not set
+    	return FMRadio::get_frequency_MHz();
+    }  	
+  }
+}
+;

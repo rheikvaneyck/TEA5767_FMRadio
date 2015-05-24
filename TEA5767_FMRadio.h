@@ -45,6 +45,9 @@
 #define DTC_50US 0
 #define DTC_75US 1
 
+#define UPPER_BAND_LIMIT 108.0
+#define LOWER_BAND_LIMIT 87.5
+
 enum 
 {
   // Data Byte #1
@@ -66,7 +69,7 @@ enum
   BL        = 0x20, // set for Japanese Band limits, unset for EU band limits
   XTAL      = 0x10, // set clock to 32.768 Hz - PLLREF must be unset
   SMUTE     = 0x08, // set for software mute
-  HCC       = 0x04, // set for high cur control
+  HCC       = 0x04, // set for high cut control
   SNC       = 0x02, // set for stereo noice cancel
   SI        = 0x01, // search indicator and make SWP1 to ready flag SWP1 must be unset
   // Data Byte #5
@@ -111,6 +114,8 @@ public:
   uint8_t get_if_counter(void);
   uint8_t get_level_ADC(void);
   uint8_t get_chip_ID(void);
+  /* Operative Functions ****/
+  void sync_data(void);
   /* Verbose Functions ******/
   uint8_t get_i2c_address(void);
   uint32_t get_config_frequency(void);
@@ -145,6 +150,7 @@ public:
   void set_search_dir(bool dir = UP);
   void set_search_stop_level(uint8_t ssl = SSL_LOW);
   /* Advanced Functions ******/
+  /* primitives */
   void set_side_injection(bool hlsi = HIGH);
   void set_mono(void);
   void set_stereo(void);
@@ -159,8 +165,12 @@ public:
   void set_japanese_band_limit(void);
   void set_EU_band_limit(void);
   void set_clock_frequency(uint8_t clock_freq = CLOCK_FREQ_327868HZ);
+  void set_high_cut_control(bool on=true);
   void set_search_indicator(bool on=true);
   void set_deemphasis_time_const(uint8_t time_constant = DTC_75US);
+  /* combined */
+  float seek(bool dir, uint8_t ssl);
+  uint8_t auto_injection_dir(float frequency_MHz);
   /* End Advanced Functions ******/
 };
 

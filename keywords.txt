@@ -66,9 +66,13 @@ set_japanese_band_limit	KEYWORD2
 set_EU_band_limit	KEYWORD2
 set_clock_frequency	KEYWORD2
 set_SW_mute	KEYWORD2
+set_SW_unmute	KEYWORD2
 set_stereo_noice_cancel	KEYWORD2
 set_search_indicator	KEYWORD2
+set_high_cut_control	KEYWORD2
 set_deemphasis_time_const	KEYWORD2
+seek	KEYWORD2
+auto_injection_dir	KEYWORD2
 
 ###########################################
 # Constants LITERAL1
